@@ -30,19 +30,20 @@ def ReLU(Z):
   
   
 def softmax(Z):
-    return np.exp(Z) / np.sum(exp(Z))
+    return np.exp(Z) / np.sum(np.exp(Z))
  
 
 def forward_prop(W1, b1, W2, b2, X):
     Z1 = W1.dot(X) + b1
     A1 = ReLU(Z1)
     Z2 = W2.dot(A1) + b2
-    A2 = softmax(Z2
+    A2 = softmax(Z2)
+    return Z1, A1, Z2, A2 
   
   
 def one_hot(Y):
     one_hot_Y = np.zeros((Y.size, Y.max() + 1))
-    one_hot_Y[np.arange(Y.size), Y) = 1
+    one_hot_Y[np.arange(Y.size), Y] = 1
     one_hot_Y = one_hot_Y.T
     return one_hot_Y
     
@@ -51,7 +52,7 @@ def deriv_ReLU(Z):
     return Z > 0
   
   
-def back_prop(W1, b1, W2, b2, X, Y):
+def back_prop(Z1, A1, Z2, A2, W2, X, Y):
     m = Y.size
     one_hot_Y = one_hot(Y)
     dZ2 = A2 - one_hot_Y
@@ -84,7 +85,7 @@ def gradient_descent(X, Y, iterations, alpha):
     W1, b1, W2, b2 = init_params()
     for i in range(iterations):
         Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X)
-        dW1, db1, dW2, db2 = backprop(Z1, A1, Z2, A2, W2, X, Y)
+        dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W2, X, Y)
         W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
         if i % 50 == 0:  # every 50 iterations, print progress
             print("Iteration: ", i)
